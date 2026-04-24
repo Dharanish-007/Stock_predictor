@@ -78,7 +78,16 @@ def main():
         }
         selected_period_label = st.selectbox("Data Period", list(period_options.keys()), index=6) # Default to 5 Years
         period = period_options[selected_period_label]
-        # Automated model selection will be used instead of manual selection
+        st.markdown("---")
+        selection_mode = st.radio("Model Selection Mode", ["Automated", "Manual"], index=0)
+        
+        model_type = None
+        if selection_mode == "Manual":
+            model_type = st.selectbox(
+                "Select Algorithm",
+                ["random_forest", "xgboost", "logistic", "svm", "neural_network"],
+                format_func=lambda x: x.replace('_', ' ').title()
+            )
         
         st.markdown("---")
         st.markdown("### 📊 Features Used")
@@ -108,9 +117,12 @@ def main():
                 feature_cols = ['MA5', 'MA20', 'RSI', 'Volatility', 'BB_Width', 'BB_Position']
                 available_features = [col for col in feature_cols if col in df.columns]
                 
-                # Automated model selection
-                model_type, selection_reason = ModelSelector.select_model(df)
-                st.info(f"🤖 **Automated Model Selection:** {selection_reason}")
+                # Model selection
+                if selection_mode == "Automated":
+                    model_type, selection_reason = ModelSelector.select_model(df)
+                    st.info(f"🤖 **Automated Model Selection:** {selection_reason}")
+                else:
+                    st.success(f"✅ **Manual Selection:** Using {model_type.replace('_', ' ').title()}")
                 
                 # Train model
                 trainer = ModelTrainer(model_type=model_type)
