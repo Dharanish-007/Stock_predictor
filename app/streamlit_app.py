@@ -15,6 +15,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.data.market_data import MarketDataFetcher
 from src.features.technical_indicators import TechnicalIndicators
 from src.models.trainer import ModelTrainer
+from src.models.model_selector import ModelSelector
 from config.settings import Config
 
 # Page configuration
@@ -65,7 +66,7 @@ def main():
         st.header("⚙️ Settings")
         stock_symbol = st.text_input("Stock Symbol", value="RELIANCE.NS").upper()
         period = st.selectbox("Data Period", ["1y", "3y", "5y", "10y"], index=2)
-        model_type = st.selectbox("Model", ["random_forest", "xgboost", "logistic", "gradient_boosting"], index=0)
+        # Automated model selection will be used instead of manual selection
         
         st.markdown("---")
         st.markdown("### 📊 Features Used")
@@ -90,6 +91,10 @@ def main():
                 # Prepare features
                 feature_cols = ['MA5', 'MA20', 'RSI', 'Volatility', 'BB_Width', 'BB_Position']
                 available_features = [col for col in feature_cols if col in df.columns]
+                
+                # Automated model selection
+                model_type, selection_reason = ModelSelector.select_model(df)
+                st.info(f"🤖 **Automated Model Selection:** {selection_reason}")
                 
                 # Train model
                 trainer = ModelTrainer(model_type=model_type)
@@ -125,7 +130,7 @@ def main():
                     st.metric(
                         label="Confidence",
                         value=f"{max(prediction_proba)*100:.1f}%",
-                        delta=f"Model: {model_type.replace('_', ' ').title()}"
+                        delta=f"Algo: {model_type.replace('_', ' ').title()}"
                     )
                 
                 # Performance metrics
@@ -213,18 +218,18 @@ def main():
             st.markdown("""
             ### 🎯 How It Works
             1. Enter a stock symbol (e.g., RELIANCE.NS, TCS.NS, AAPL)
-            2. Select data period and model
-            3. Click predict to get tomorrow's trend
+            2. Select data period
+            3. Click predict; our **Auto-Selection Algorithm** will choose the best model based on dataset size
             4. View performance metrics and charts
             """)
         
         with col2:
             st.markdown("""
-            ### 📚 Supported Models
-            - **Random Forest** (default) - Best for noisy data
-            - **XGBoost** - Advanced boosting
-            - **Logistic Regression** - Baseline model
-            - **Gradient Boosting** - Sequential learning
+            ### 🤖 Intelligent Selection
+            The system automatically selects between:
+            - **Logistic Regression**: Optimized for small datasets (< 500 samples)
+            - **Random Forest**: Optimized for medium datasets (500-1500 samples)
+            - **XGBoost**: Optimized for large datasets (> 1500 samples)
             """)
 
 if __name__ == "__main__":
