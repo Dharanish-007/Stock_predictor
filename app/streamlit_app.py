@@ -227,9 +227,11 @@ def main():
             st.markdown("""
             ### 🤖 Intelligent Selection
             The system automatically selects between:
-            - **Logistic Regression**: Optimized for small datasets (< 500 samples)
-            - **Random Forest**: Optimized for medium datasets (500-1500 samples)
-            - **XGBoost**: Optimized for large datasets (> 1500 samples)
+            - **Logistic Regression**: Optimized for very small datasets (< 300)
+            - **SVM**: Optimized for small-medium datasets (300-800)
+            - **Random Forest**: Optimized for medium datasets (800-1500)
+            - **Neural Network**: Optimized for large datasets (1500-3000)
+            - **XGBoost**: Optimized for ultra-large datasets (> 3000)
             """)
 
 if __name__ == "__main__":

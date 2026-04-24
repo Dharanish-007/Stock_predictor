@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
@@ -62,6 +64,15 @@ class ModelTrainer:
             'gradient_boosting': GradientBoostingClassifier(
                 n_estimators=Config.MODEL_CONFIG.n_estimators,
                 max_depth=Config.MODEL_CONFIG.max_depth,
+                random_state=Config.MODEL_CONFIG.random_state
+            ),
+            'svm': SVC(
+                probability=True,
+                random_state=Config.MODEL_CONFIG.random_state
+            ),
+            'neural_network': MLPClassifier(
+                hidden_layer_sizes=(100, 50),
+                max_iter=1000,
                 random_state=Config.MODEL_CONFIG.random_state
             )
         }
